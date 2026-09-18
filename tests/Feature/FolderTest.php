@@ -47,7 +47,39 @@ test('deletes a folder', function () {
     $this->deleteJson("/api/folders/{$folder['id']}")
         ->assertNoContent();
 
-    $this->assertSoftDeleted('folders', [
+    $this->assertDatabaseMissing('folders', [
         'id' => $folder['id'],
+    ]);
+});
+
+test('deleting a folder deletes its nested contents', function () {
+    $parent = $this->postJson('/api/folders', [
+        'name' => 'Documents',
+        'parent_id' => null,
+    ])->json('data');
+
+    $child = $this->postJson('/api/folders', [
+        'name' => 'Work',
+        'parent_id' => $parent['id'],
+    ])->json('data');
+
+    $file = $this->postJson('/api/files', [
+        'name' => 'report.pdf',
+        'folder_id' => $child['id'],
+    ])->json('data');
+
+    $this->deleteJson("/api/folders/{$parent['id']}")
+        ->assertNoContent();
+
+    $this->assertDatabaseMissing('folders', [
+        'id' => $parent['id'],
+    ]);
+
+    $this->assertDatabaseMissing('folders', [
+        'id' => $child['id'],
+    ]);
+
+    $this->assertDatabaseMissing('files', [
+        'id' => $file['id'],
     ]);
 });

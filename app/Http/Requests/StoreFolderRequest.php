@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreFolderRequest extends FormRequest
 {
@@ -27,6 +28,14 @@ class StoreFolderRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+
+                Rule::unique('folders', 'name')->where(function ($query) {
+                    if ($this->parent_id === null) {
+                        return $query->whereNull('parent_id');
+                    }
+
+                    return $query->where('parent_id', $this->parent_id);
+                }),
             ],
 
             'parent_id' => [

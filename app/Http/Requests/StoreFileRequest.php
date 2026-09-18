@@ -29,25 +29,19 @@ class StoreFileRequest extends FormRequest
                 'string',
                 'max:255',
 
-                Rule::unique('files', 'name')
-                    ->where(function ($query) {
-                        if ($this->folder_id === null) {
-                            return $query
-                                ->whereNull('folder_id')
-                                ->whereNull('deleted_at');
-                        }
+                Rule::unique('files', 'name')->where(function ($query) {
+                    if ($this->folder_id === null) {
+                        return $query->whereNull('folder_id');
+                    }
 
-                        return $query
-                            ->where('folder_id', $this->folder_id)
-                            ->whereNull('deleted_at');
-                    }),
+                    return $query->where('folder_id', $this->folder_id);
+                }),
             ],
 
             'folder_id' => [
                 'nullable',
-
-                Rule::exists('folders', 'id')
-                    ->whereNull('deleted_at'),
+                'integer',
+                Rule::exists('folders', 'id'),
             ],
         ];
     }

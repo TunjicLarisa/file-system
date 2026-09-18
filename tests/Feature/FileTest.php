@@ -47,7 +47,7 @@ test('deletes a file', function () {
     $this->deleteJson("/api/files/{$file['id']}")
         ->assertNoContent();
 
-    $this->assertSoftDeleted('files', [
+    $this->assertDatabaseMissing('files', [
         'id' => $file['id'],
     ]);
 });
