@@ -75,14 +75,58 @@ Both search modes can operate either:
 
 When searching across all files, the API also returns the folder path so files with the same or similar names can be located.
 
-## Installation
-
 Clone the repository:
 
 ```bash
 git clone https://github.com/TunjicLarisa/file-system.git
 cd file-system
 ```
+
+## Docker
+
+Docker is optional. The application can also be run using the local setup described later.
+
+Build and start the application:
+
+```bash
+docker compose up --build
+```
+
+The application will be available at:
+
+```text
+http://localhost:8000
+```
+
+On the first start, Docker creates the SQLite database automatically, runs the migrations and seeds the example data.
+
+Run the automated test suite inside the container:
+
+```bash
+docker compose exec app php artisan test
+```
+
+Check migration status:
+
+```bash
+docker compose exec app php artisan migrate:status
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+To remove the persisted SQLite database volume as well:
+
+```bash
+docker compose down -v
+```
+
+The Docker setup uses a named volume for the SQLite database, so data persists between container restarts.
+
+## Local Installation
 
 Install PHP dependencies:
 
