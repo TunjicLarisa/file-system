@@ -82,6 +82,7 @@ Clone the repository:
 ```bash
 git clone https://github.com/TunjicLarisa/file-system.git
 cd file-system
+```
 
 Install PHP dependencies:
 
