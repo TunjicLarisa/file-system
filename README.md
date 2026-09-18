@@ -114,14 +114,6 @@ Create the SQLite database:
     php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
 ```
 
-Make sure the following values are configured in `.env`:
-
-```env
-    DB_CONNECTION=sqlite
-    SESSION_DRIVER=file
-    CACHE_STORE=file
-```
-
 Run the database migrations and seed example data:
 
 ```bash
