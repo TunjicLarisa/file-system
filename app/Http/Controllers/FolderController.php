@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreFolderRequest;
 use App\Http\Resources\FolderResource;
 use App\Models\Folder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class FolderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         $parentId = $request->query('parent_id');
 
@@ -31,7 +34,7 @@ class FolderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreFolderRequest $request)
+    public function store(StoreFolderRequest $request): JsonResponse
     {
         $folder = Folder::create(
             $request->validated()
@@ -45,7 +48,7 @@ class FolderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Folder $folder)
+    public function destroy(Folder $folder): Response
     {
         $folder->delete();
 

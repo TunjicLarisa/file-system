@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\SearchFilesRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SearchController extends Controller
 {
     /**
      * Return top 10 files whose name starts with the search string.
      */
-    public function suggestions(SearchFilesRequest $request)
+    public function suggestions(SearchFilesRequest $request): AnonymousResourceCollection
     {
         $search = $request->validated('q');
         $searchAll = $request->boolean('all');
@@ -38,7 +39,7 @@ class SearchController extends Controller
     /**
      * Search for an exact file name.
      */
-    public function exact(SearchFilesRequest $request)
+    public function exact(SearchFilesRequest $request): AnonymousResourceCollection
     {
         $data = $request->validated();
 

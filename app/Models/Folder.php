@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Folder extends Model
 {
@@ -11,17 +13,26 @@ class Folder extends Model
         'parent_id',
     ];
 
-    public function parent()
+    /**
+     * @return BelongsTo<Folder, $this>
+     */
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Folder::class, 'parent_id');
     }
 
-    public function children()
+    /**
+     * @return HasMany<Folder, $this>
+     */
+    public function children(): HasMany
     {
         return $this->hasMany(Folder::class, 'parent_id');
     }
 
-    public function files()
+    /**
+     * @return HasMany<File, $this>
+     */
+    public function files(): HasMany
     {
         return $this->hasMany(File::class);
     }

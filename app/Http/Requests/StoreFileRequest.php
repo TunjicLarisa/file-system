@@ -14,13 +14,18 @@ class StoreFileRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->has('name')) {
+        $name = $this->input('name');
+
+        if (is_string($name)) {
             $this->merge([
-                'name' => trim($this->name),
+                'name' => trim($name),
             ]);
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [

@@ -13,13 +13,18 @@ class SearchFilesRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->has('q')) {
+        $query = $this->input('q');
+
+        if (is_string($query)) {
             $this->merge([
-                'q' => trim($this->q),
+                'q' => trim($query),
             ]);
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [
