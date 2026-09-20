@@ -171,3 +171,28 @@ test('treats sql wildcard characters as literal search characters', function () 
         ->assertOk()
         ->assertJsonCount(0, 'data');
 });
+
+test('paginates exact search across all files', function () {
+    for ($i = 1; $i <= 55; $i++) {
+        $folder = $this->postJson('/api/folders', [
+            'name' => "Folder {$i}",
+            'parent_id' => null,
+        ])->json('data');
+
+        $this->postJson('/api/files', [
+            'name' => 'report.pdf',
+            'folder_id' => $folder['id'],
+        ])->assertCreated();
+    }
+
+    $response = $this->getJson(
+        '/api/search/exact?q=report.pdf&all=1&page=1'
+    );
+
+    $response
+        ->assertOk()
+        ->assertJsonCount(50, 'data')
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.last_page', 2)
+        ->assertJsonPath('meta.total', 55);
+});

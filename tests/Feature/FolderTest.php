@@ -117,10 +117,74 @@ test('paginates files in a folder', function () {
         ->assertJsonPath('meta.current_page', 2);
 });
 
-// test('does not allow duplicate files in the same folder', ...);
+test('does not allow duplicate folders in the same parent', function () {
+    $parent = $this->postJson('/api/folders', [
+        'name' => 'Documents',
+        'parent_id' => null,
+    ])->json('data');
 
-// test('does not allow duplicate folders in the same parent', ...);
+    $this->postJson('/api/folders', [
+        'name' => 'Work',
+        'parent_id' => $parent['id'],
+    ])->assertCreated();
 
-// test('paginates folders', ...);
+    $response = $this->postJson('/api/folders', [
+        'name' => 'Work',
+        'parent_id' => $parent['id'],
+    ]);
 
-// test('rejects an invalid parent folder', ...);
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+});
+
+test('paginates folders', function () {
+    for ($i = 1; $i <= 55; $i++) {
+        $this->postJson('/api/folders', [
+            'name' => "Folder {$i}",
+            'parent_id' => null,
+        ])->assertCreated();
+    }
+
+    $firstPage = $this->getJson('/api/folders?page=1');
+
+    $firstPage
+        ->assertOk()
+        ->assertJsonCount(50, 'data')
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.per_page', 50)
+        ->assertJsonPath('meta.last_page', 2)
+        ->assertJsonPath('meta.total', 55);
+
+    $secondPage = $this->getJson('/api/folders?page=2');
+
+    $secondPage
+        ->assertOk()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.current_page', 2);
+});
+
+test('rejects an invalid parent folder', function () {
+    $response = $this->postJson('/api/folders', [
+        'name' => 'Work',
+        'parent_id' => 999999,
+    ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('parent_id');
+});
+
+test('does not allow duplicate files in root', function () {
+    $this->postJson('/api/files', [
+        'name' => 'readme.txt',
+        'folder_id' => null,
+    ])->assertCreated();
+
+    $this->postJson('/api/files', [
+        'name' => 'readme.txt',
+        'folder_id' => null,
+    ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+});

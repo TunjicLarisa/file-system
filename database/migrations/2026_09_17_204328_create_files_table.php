@@ -17,10 +17,15 @@ return new class extends Migration
             $table->foreignId('folder_id')->nullable()->constrained('folders')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->index(['folder_id', 'name']);
-            $table->index('name');
             $table->unique(['folder_id', 'name']);
+            $table->index('name');
         });
+
+        DB::statement(
+            'CREATE UNIQUE INDEX files_root_name_unique
+            ON files(name)
+            WHERE folder_id IS NULL'
+        );
     }
 
     /**

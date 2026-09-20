@@ -56,7 +56,7 @@ class SearchController extends Controller
                     : $query->whereNull('folder_id')
             )
             ->orderBy('name')
-            ->get();
+            ->paginate(50);
 
         return FileResource::collection($files);
     }

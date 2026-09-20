@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -17,9 +18,14 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->constrained('folders')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->index(['parent_id', 'name']);
             $table->unique(['parent_id', 'name']);
         });
+
+        DB::statement(
+            'CREATE UNIQUE INDEX folders_root_name_unique
+            ON folders(name)
+            WHERE parent_id IS NULL'
+        );
     }
 
     /**

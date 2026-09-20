@@ -25,6 +25,9 @@ export default {
 
             folderPagination: null,
             filePagination: null,
+
+            searchPage: 1,
+            searchPagination: null,
         }
     },
     watch: {
@@ -349,6 +352,8 @@ export default {
                 all: this.searchAllFiles ? '1' : '0',
             })
 
+            params.set('page', this.searchPage)
+
             if (
                 !this.searchAllFiles &&
                 this.currentFolderId !== null
@@ -376,7 +381,8 @@ export default {
                     return
                 }
 
-                this.searchResults = data.data ?? data
+                this.searchResults = data.data ?? []
+                this.searchPagination = data.meta ?? null
 
                 this.suggestions = []
 
@@ -456,6 +462,18 @@ export default {
 
             this.filePage = page;
             await this.loadFolder();
+        },
+        async changeSearchPage(page) {
+            if (
+                !this.searchPagination ||
+                page < 1 ||
+                page > this.searchPagination.last_page
+            ) {
+                return
+            }
+
+            this.searchPage = page
+            await this.exactSearch()
         },
         
     },
@@ -604,8 +622,12 @@ export default {
                             </h2>
 
                             <span class="text-xs text-gray-400">
-                                {{ childFolders.length }}
-                                folder{{ childFolders.length === 1 ? '' : 's' }}
+                                {{ folderPagination?.total ?? childFolders.length }}
+                                folder{{
+                                    (folderPagination?.total ?? childFolders.length) === 1
+                                        ? ''
+                                        : 's'
+                                }}
                             </span>
                         </div>
 
@@ -771,6 +793,7 @@ export default {
                             </p>
                         </div>
 
+                        <!-- Normal file pagination -->
                         <div
                             v-if="
                                 !search &&
@@ -798,6 +821,40 @@ export default {
                                     filePagination.current_page === filePagination.last_page
                                 "
                                 @click="changeFilePage(filePagination.current_page + 1)"
+                                class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                <CircleChevronRight class="h-6 w-6" />
+                            </button>
+                        </div>
+
+                        <!-- Exact search pagination -->
+                        <div
+                            v-if="
+                                search &&
+                                searchPagination &&
+                                searchPagination.last_page > 1
+                            "
+                            class="mt-4 flex items-center justify-center gap-3"
+                        >
+                            <button
+                                :disabled="searchPagination.current_page === 1"
+                                @click="changeSearchPage(searchPagination.current_page - 1)"
+                                class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                <CircleChevronLeft class="h-6 w-6" />
+                            </button>
+
+                            <span class="text-sm text-gray-500">
+                                {{ searchPagination.current_page }}
+                                /
+                                {{ searchPagination.last_page }}
+                            </span>
+
+                            <button
+                                :disabled="
+                                    searchPagination.current_page === searchPagination.last_page
+                                "
+                                @click="changeSearchPage(searchPagination.current_page + 1)"
                                 class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 <CircleChevronRight class="h-6 w-6" />
