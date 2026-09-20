@@ -62,10 +62,10 @@ For running the project without Docker, the following tools are required:
 - npm
 - SQLite support
 - PHP extensions:
-  - `pdo_sqlite`
-  - `sqlite3`
-  - `mbstring`
-  - `zip`
+    - `pdo_sqlite`
+    - `sqlite3`
+    - `mbstring`
+    - `zip`
 
 ### Windows
 
@@ -288,16 +288,16 @@ number of records into the browser.
 
 ## API
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| GET | `/api/folders` | List folders in a parent folder |
-| POST | `/api/folders` | Create a folder |
-| DELETE | `/api/folders/{folder}` | Delete a folder and nested contents |
-| GET | `/api/files` | List files in a folder |
-| POST | `/api/files` | Create a file |
-| DELETE | `/api/files/{file}` | Delete a file |
-| GET | `/api/search/suggestions` | Return up to 10 prefix matches |
-| GET | `/api/search/exact` | Search for an exact filename |
+| Method | Endpoint                  | Description                         |
+| ------ | ------------------------- | ----------------------------------- |
+| GET    | `/api/folders`            | List folders in a parent folder     |
+| POST   | `/api/folders`            | Create a folder                     |
+| DELETE | `/api/folders/{folder}`   | Delete a folder and nested contents |
+| GET    | `/api/files`              | List files in a folder              |
+| POST   | `/api/files`              | Create a file                       |
+| DELETE | `/api/files/{file}`       | Delete a file                       |
+| GET    | `/api/search/suggestions` | Return up to 10 prefix matches      |
+| GET    | `/api/search/exact`       | Search for an exact filename        |
 
 Folder and file listing endpoints return 50 records per page.
 

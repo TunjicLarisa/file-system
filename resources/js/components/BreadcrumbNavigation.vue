@@ -1,5 +1,5 @@
 <script>
-import { ArrowLeft } from 'lucide-vue-next'
+import { ArrowLeft } from 'lucide-vue-next';
 
 export default {
     components: {
@@ -13,12 +13,8 @@ export default {
         },
     },
 
-    emits: [
-        'back',
-        'home',
-        'navigate',
-    ],
-}
+    emits: ['back', 'home', 'navigate'],
+};
 </script>
 
 <template>
@@ -30,7 +26,7 @@ export default {
                 :class="[
                     'flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300',
                     path.length === 0
-                        ? 'invisible pointer-events-none'
+                        ? 'pointer-events-none invisible'
                         : 'bg-white text-gray-600 hover:bg-gray-50',
                 ]"
             >
@@ -45,13 +41,8 @@ export default {
                     Home
                 </button>
 
-                <template
-                    v-for="(folder, index) in path"
-                    :key="folder.id"
-                >
-                    <span class="text-gray-400">
-                        /
-                    </span>
+                <template v-for="(folder, index) in path" :key="folder.id">
+                    <span class="text-gray-400"> / </span>
 
                     <button
                         @click="$emit('navigate', index)"

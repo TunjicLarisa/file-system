@@ -5,7 +5,7 @@ import {
     Trash,
     CircleChevronLeft,
     CircleChevronRight,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
 export default {
     components: {
@@ -43,28 +43,26 @@ export default {
         },
     },
 
-    emits: [
-        'delete',
-        'change-file-page',
-        'change-search-page',
-    ],
+    emits: ['delete', 'change-file-page', 'change-search-page'],
 
     computed: {
         totalFiles() {
             if (this.searchActive) {
-                return this.searchPagination?.total ?? this.files.length
+                return this.searchPagination?.total ?? this.files.length;
             }
 
-            return this.filePagination?.total ?? this.files.length
+            return this.filePagination?.total ?? this.files.length;
         },
     },
-}
+};
 </script>
 
 <template>
     <section>
         <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
+            <h2
+                class="text-sm font-semibold tracking-wide text-gray-500 uppercase"
+            >
                 {{ searchActive ? 'Search results' : 'Files' }}
             </h2>
 
@@ -74,17 +72,16 @@ export default {
             </span>
         </div>
 
-        <div
-            v-if="files.length > 0"
-            class="space-y-2"
-        >
+        <div v-if="files.length > 0" class="space-y-2">
             <div
                 v-for="file in files"
                 :key="file.id"
                 class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 transition hover:bg-gray-50"
             >
                 <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-900">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-900"
+                    >
                         <File class="h-5 w-5" />
                     </div>
 
@@ -100,12 +97,7 @@ export default {
                             {{ file.folder_path }}
                         </div>
 
-                        <div
-                            v-else
-                            class="text-xs text-gray-400"
-                        >
-                            File
-                        </div>
+                        <div v-else class="text-xs text-gray-400">File</div>
                     </div>
                 </div>
 
@@ -138,18 +130,15 @@ export default {
 
         <div
             v-if="
-                !searchActive &&
-                filePagination &&
-                filePagination.last_page > 1
+                !searchActive && filePagination && filePagination.last_page > 1
             "
             class="mt-4 flex items-center justify-center gap-3"
         >
             <button
                 :disabled="filePagination.current_page === 1"
-                @click="$emit(
-                    'change-file-page',
-                    filePagination.current_page - 1
-                )"
+                @click="
+                    $emit('change-file-page', filePagination.current_page - 1)
+                "
                 class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 <CircleChevronLeft class="h-6 w-6" />
@@ -163,13 +152,11 @@ export default {
 
             <button
                 :disabled="
-                    filePagination.current_page ===
-                    filePagination.last_page
+                    filePagination.current_page === filePagination.last_page
                 "
-                @click="$emit(
-                    'change-file-page',
-                    filePagination.current_page + 1
-                )"
+                @click="
+                    $emit('change-file-page', filePagination.current_page + 1)
+                "
                 class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 <CircleChevronRight class="h-6 w-6" />
@@ -188,10 +175,12 @@ export default {
         >
             <button
                 :disabled="searchPagination.current_page === 1"
-                @click="$emit(
-                    'change-search-page',
-                    searchPagination.current_page - 1
-                )"
+                @click="
+                    $emit(
+                        'change-search-page',
+                        searchPagination.current_page - 1,
+                    )
+                "
                 class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 <CircleChevronLeft class="h-6 w-6" />
@@ -205,13 +194,14 @@ export default {
 
             <button
                 :disabled="
-                    searchPagination.current_page ===
-                    searchPagination.last_page
+                    searchPagination.current_page === searchPagination.last_page
                 "
-                @click="$emit(
-                    'change-search-page',
-                    searchPagination.current_page + 1
-                )"
+                @click="
+                    $emit(
+                        'change-search-page',
+                        searchPagination.current_page + 1,
+                    )
+                "
                 class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 <CircleChevronRight class="h-6 w-6" />

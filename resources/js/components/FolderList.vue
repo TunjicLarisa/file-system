@@ -5,7 +5,7 @@ import {
     Trash,
     CircleChevronLeft,
     CircleChevronRight,
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
 
 export default {
     components: {
@@ -28,18 +28,14 @@ export default {
         },
     },
 
-    emits: [
-        'open',
-        'delete',
-        'change-page',
-    ],
+    emits: ['open', 'delete', 'change-page'],
 
     computed: {
         totalFolders() {
-            return this.pagination?.total ?? this.folders.length
+            return this.pagination?.total ?? this.folders.length;
         },
     },
-}
+};
 </script>
 
 <template>
@@ -55,10 +51,7 @@ export default {
             </span>
         </div>
 
-        <div
-            v-if="folders.length > 0"
-            class="space-y-2"
-        >
+        <div v-if="folders.length > 0" class="space-y-2">
             <div
                 v-for="folder in folders"
                 :key="folder.id"
@@ -68,7 +61,9 @@ export default {
                     @click="$emit('open', folder)"
                     class="flex flex-1 items-center gap-3 text-left"
                 >
-                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-xl">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-xl"
+                    >
                         <Folder />
                     </div>
 
@@ -77,9 +72,7 @@ export default {
                             {{ folder.name }}
                         </div>
 
-                        <div class="text-xs text-gray-400">
-                            Folder
-                        </div>
+                        <div class="text-xs text-gray-400">Folder</div>
                     </div>
                 </button>
 
@@ -98,10 +91,7 @@ export default {
             >
                 <button
                     :disabled="pagination.current_page === 1"
-                    @click="$emit(
-                        'change-page',
-                        pagination.current_page - 1
-                    )"
+                    @click="$emit('change-page', pagination.current_page - 1)"
                     class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     <CircleChevronLeft class="h-6 w-6" />
@@ -114,14 +104,8 @@ export default {
                 </span>
 
                 <button
-                    :disabled="
-                        pagination.current_page ===
-                        pagination.last_page
-                    "
-                    @click="$emit(
-                        'change-page',
-                        pagination.current_page + 1
-                    )"
+                    :disabled="pagination.current_page === pagination.last_page"
+                    @click="$emit('change-page', pagination.current_page + 1)"
                     class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     <CircleChevronRight class="h-6 w-6" />
@@ -135,9 +119,7 @@ export default {
         >
             <FolderOpen class="mb-2 h-8 w-8 text-gray-400" />
 
-            <p class="text-sm text-gray-500">
-                No folders in this directory.
-            </p>
+            <p class="text-sm text-gray-500">No folders in this directory.</p>
         </div>
     </section>
 </template>

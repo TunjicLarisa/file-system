@@ -1,13 +1,10 @@
 <script>
-import {
-    FolderPlus,
-    FilePlusCorner,
-} from 'lucide-vue-next'
+import { FolderPlus, FilePlusCorner } from 'lucide-vue-next';
 
-import FileSearch from '../components/FileSearch.vue'
-import BreadcrumbNavigation from '../components/BreadcrumbNavigation.vue'
-import FolderList from '../components/FolderList.vue'
-import FileList from '../components/FileList.vue'
+import FileSearch from '../components/FileSearch.vue';
+import BreadcrumbNavigation from '../components/BreadcrumbNavigation.vue';
+import FolderList from '../components/FolderList.vue';
+import FileList from '../components/FileList.vue';
 
 export default {
     components: {
@@ -41,34 +38,34 @@ export default {
             folderPagination: null,
             filePagination: null,
             searchPagination: null,
-        }
+        };
     },
 
     watch: {
         search() {
-            clearTimeout(this.searchTimer)
+            clearTimeout(this.searchTimer);
 
-            this.searchPage = 1
-            this.searchResults = []
-            this.searchPagination = null
+            this.searchPage = 1;
+            this.searchResults = [];
+            this.searchPagination = null;
 
             if (!this.search.trim()) {
-                this.suggestions = []
-                return
+                this.suggestions = [];
+                return;
             }
 
             this.searchTimer = setTimeout(() => {
-                this.loadSuggestions()
-            }, 300)
+                this.loadSuggestions();
+            }, 300);
         },
 
         searchAllFiles() {
-            this.searchPage = 1
-            this.searchResults = []
-            this.searchPagination = null
+            this.searchPage = 1;
+            this.searchResults = [];
+            this.searchPagination = null;
 
             if (this.search.trim()) {
-                this.loadSuggestions()
+                this.loadSuggestions();
             }
         },
     },
@@ -76,10 +73,10 @@ export default {
     computed: {
         displayedFiles() {
             if (this.search.trim()) {
-                return this.searchResults
+                return this.searchResults;
             }
 
-            return this.files
+            return this.files;
         },
     },
 
@@ -87,240 +84,191 @@ export default {
         async loadFolder() {
             const folderParams = new URLSearchParams({
                 page: this.folderPage,
-            })
+            });
 
             const fileParams = new URLSearchParams({
                 page: this.filePage,
-            })
+            });
 
             if (this.currentFolderId !== null) {
-                folderParams.set(
-                    'parent_id',
-                    this.currentFolderId
-                )
+                folderParams.set('parent_id', this.currentFolderId);
 
-                fileParams.set(
-                    'folder_id',
-                    this.currentFolderId
-                )
+                fileParams.set('folder_id', this.currentFolderId);
             }
 
             try {
-                const [foldersResponse, filesResponse] =
-                    await Promise.all([
-                        fetch(
-                            `/api/folders?${folderParams.toString()}`
-                        ),
+                const [foldersResponse, filesResponse] = await Promise.all([
+                    fetch(`/api/folders?${folderParams.toString()}`),
 
-                        fetch(
-                            `/api/files?${fileParams.toString()}`
-                        ),
-                    ])
+                    fetch(`/api/files?${fileParams.toString()}`),
+                ]);
 
-                if (
-                    !foldersResponse.ok ||
-                    !filesResponse.ok
-                ) {
-                    console.error(
-                        'Could not load folder contents'
-                    )
-                    return
+                if (!foldersResponse.ok || !filesResponse.ok) {
+                    console.error('Could not load folder contents');
+                    return;
                 }
 
-                const foldersData =
-                    await foldersResponse.json()
+                const foldersData = await foldersResponse.json();
 
-                const filesData =
-                    await filesResponse.json()
+                const filesData = await filesResponse.json();
 
-                this.folders =
-                    foldersData.data ?? []
+                this.folders = foldersData.data ?? [];
 
-                this.files =
-                    filesData.data ?? []
+                this.files = filesData.data ?? [];
 
-                this.folderPagination =
-                    foldersData.meta ?? null
+                this.folderPagination = foldersData.meta ?? null;
 
-                this.filePagination =
-                    filesData.meta ?? null
+                this.filePagination = filesData.meta ?? null;
             } catch (error) {
-                console.error(error)
+                console.error(error);
             }
         },
 
         async createFolder() {
-            const name = prompt('Folder name:')
+            const name = prompt('Folder name:');
 
             if (name === null) {
-                return
+                return;
             }
 
             try {
-                const response = await fetch(
-                    '/api/folders',
-                    {
-                        method: 'POST',
+                const response = await fetch('/api/folders', {
+                    method: 'POST',
 
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-                            Accept: 'application/json',
-                        },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
 
-                        body: JSON.stringify({
-                            name: name.trim(),
-                            parent_id:
-                                this.currentFolderId,
-                        }),
-                    }
-                )
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        parent_id: this.currentFolderId,
+                    }),
+                });
 
-                const data = await response.json()
+                const data = await response.json();
 
                 if (!response.ok) {
-                    this.showApiError(
-                        response,
-                        data
-                    )
-                    return
+                    this.showApiError(response, data);
+                    return;
                 }
 
-                await this.loadFolder()
+                await this.loadFolder();
             } catch (error) {
-                this.showUnexpectedError(error)
+                this.showUnexpectedError(error);
             }
         },
 
         async createFile() {
-            const name = prompt('File name:')
+            const name = prompt('File name:');
 
             if (name === null) {
-                return
+                return;
             }
 
             try {
-                const response = await fetch(
-                    '/api/files',
-                    {
-                        method: 'POST',
+                const response = await fetch('/api/files', {
+                    method: 'POST',
 
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-                            Accept: 'application/json',
-                        },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
 
-                        body: JSON.stringify({
-                            name: name.trim(),
-                            folder_id:
-                                this.currentFolderId,
-                        }),
-                    }
-                )
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        folder_id: this.currentFolderId,
+                    }),
+                });
 
-                const data = await response.json()
+                const data = await response.json();
 
                 if (!response.ok) {
-                    this.showApiError(
-                        response,
-                        data
-                    )
-                    return
+                    this.showApiError(response, data);
+                    return;
                 }
 
-                await this.loadFolder()
+                await this.loadFolder();
             } catch (error) {
-                this.showUnexpectedError(error)
+                this.showUnexpectedError(error);
             }
         },
 
         async deleteFolder(folder) {
-            const confirmed = confirm(
-                `Delete folder "${folder.name}"?`
-            )
+            const confirmed = confirm(`Delete folder "${folder.name}"?`);
 
             if (!confirmed) {
-                return
+                return;
             }
 
             try {
-                const response = await fetch(
-                    `/api/folders/${folder.id}`,
-                    {
-                        method: 'DELETE',
+                const response = await fetch(`/api/folders/${folder.id}`, {
+                    method: 'DELETE',
 
-                        headers: {
-                            Accept: 'application/json',
-                        },
-                    }
-                )
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                });
 
                 if (!response.ok) {
                     await this.showDeleteError(
                         response,
-                        'Could not delete folder.'
-                    )
+                        'Could not delete folder.',
+                    );
 
-                    return
+                    return;
                 }
 
-                await this.loadFolder()
+                await this.loadFolder();
             } catch (error) {
-                this.showUnexpectedError(error)
+                this.showUnexpectedError(error);
             }
         },
 
         async deleteFile(file) {
-            const confirmed = confirm(
-                `Delete file "${file.name}"?`
-            )
+            const confirmed = confirm(`Delete file "${file.name}"?`);
 
             if (!confirmed) {
-                return
+                return;
             }
 
             try {
-                const response = await fetch(
-                    `/api/files/${file.id}`,
-                    {
-                        method: 'DELETE',
+                const response = await fetch(`/api/files/${file.id}`, {
+                    method: 'DELETE',
 
-                        headers: {
-                            Accept: 'application/json',
-                        },
-                    }
-                )
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                });
 
                 if (!response.ok) {
                     await this.showDeleteError(
                         response,
-                        'Could not delete file.'
-                    )
+                        'Could not delete file.',
+                    );
 
-                    return
+                    return;
                 }
 
                 if (this.search.trim()) {
-                    await this.exactSearch()
+                    await this.exactSearch();
                 } else {
-                    await this.loadFolder()
+                    await this.loadFolder();
                 }
             } catch (error) {
-                this.showUnexpectedError(error)
+                this.showUnexpectedError(error);
             }
         },
 
         async loadSuggestions() {
-            const query = this.search.trim()
+            const query = this.search.trim();
 
             if (!query) {
-                this.suggestions = []
-                return
+                this.suggestions = [];
+                return;
             }
 
-            const params =
-                this.createSearchParams(query)
+            const params = this.createSearchParams(query);
 
             try {
                 const response = await fetch(
@@ -329,43 +277,38 @@ export default {
                         headers: {
                             Accept: 'application/json',
                         },
-                    }
-                )
+                    },
+                );
 
-                const data = await response.json()
+                const data = await response.json();
 
                 if (!response.ok) {
-                    this.suggestions = []
-                    return
+                    this.suggestions = [];
+                    return;
                 }
 
-                this.suggestions =
-                    data.data ?? data
+                this.suggestions = data.data ?? data;
             } catch (error) {
-                console.error(error)
-                this.suggestions = []
+                console.error(error);
+                this.suggestions = [];
             }
         },
 
         async exactSearch() {
-            clearTimeout(this.searchTimer)
+            clearTimeout(this.searchTimer);
 
-            const query = this.search.trim()
+            const query = this.search.trim();
 
             if (!query) {
-                this.searchResults = []
-                this.suggestions = []
-                this.searchPagination = null
-                return
+                this.searchResults = [];
+                this.suggestions = [];
+                this.searchPagination = null;
+                return;
             }
 
-            const params =
-                this.createSearchParams(query)
+            const params = this.createSearchParams(query);
 
-            params.set(
-                'page',
-                this.searchPage
-            )
+            params.set('page', this.searchPage);
 
             try {
                 const response = await fetch(
@@ -374,27 +317,25 @@ export default {
                         headers: {
                             Accept: 'application/json',
                         },
-                    }
-                )
+                    },
+                );
 
-                const data = await response.json()
+                const data = await response.json();
 
                 if (!response.ok) {
-                    this.searchResults = []
-                    this.searchPagination = null
-                    return
+                    this.searchResults = [];
+                    this.searchPagination = null;
+                    return;
                 }
 
-                this.searchResults =
-                    data.data ?? []
+                this.searchResults = data.data ?? [];
 
-                this.searchPagination =
-                    data.meta ?? null
+                this.searchPagination = data.meta ?? null;
 
-                this.suggestions = []
+                this.suggestions = [];
             } catch (error) {
-                console.error(error)
-                this.searchResults = []
+                console.error(error);
+                this.searchResults = [];
             }
         },
 
@@ -402,197 +343,159 @@ export default {
             const params = new URLSearchParams({
                 q: query,
 
-                all: this.searchAllFiles
-                    ? '1'
-                    : '0',
-            })
+                all: this.searchAllFiles ? '1' : '0',
+            });
 
-            if (
-                !this.searchAllFiles &&
-                this.currentFolderId !== null
-            ) {
-                params.set(
-                    'folder_id',
-                    this.currentFolderId
-                )
+            if (!this.searchAllFiles && this.currentFolderId !== null) {
+                params.set('folder_id', this.currentFolderId);
             }
 
-            return params
+            return params;
         },
 
         async selectSuggestion(file) {
-            this.search = file.name
-            this.suggestions = []
+            this.search = file.name;
+            this.suggestions = [];
 
-            await this.exactSearch()
+            await this.exactSearch();
         },
 
         async openFolder(folder) {
             this.path.push({
                 id: folder.id,
                 name: folder.name,
-            })
+            });
 
-            this.currentFolderId = folder.id
+            this.currentFolderId = folder.id;
 
-            this.resetDirectoryState()
+            this.resetDirectoryState();
 
-            await this.loadFolder()
+            await this.loadFolder();
         },
 
         async goHome() {
-            this.path = []
-            this.currentFolderId = null
+            this.path = [];
+            this.currentFolderId = null;
 
-            this.resetDirectoryState()
+            this.resetDirectoryState();
 
-            await this.loadFolder()
+            await this.loadFolder();
         },
 
         async goBack() {
             if (this.path.length === 0) {
-                return
+                return;
             }
 
-            this.path.pop()
+            this.path.pop();
 
             this.currentFolderId =
                 this.path.length === 0
                     ? null
-                    : this.path[
-                          this.path.length - 1
-                      ].id
+                    : this.path[this.path.length - 1].id;
 
-            this.resetDirectoryState()
+            this.resetDirectoryState();
 
-            await this.loadFolder()
+            await this.loadFolder();
         },
 
         async goToPath(index) {
-            this.path =
-                this.path.slice(0, index + 1)
+            this.path = this.path.slice(0, index + 1);
 
-            this.currentFolderId =
-                this.path[
-                    this.path.length - 1
-                ].id
+            this.currentFolderId = this.path[this.path.length - 1].id;
 
-            this.resetDirectoryState()
+            this.resetDirectoryState();
 
-            await this.loadFolder()
+            await this.loadFolder();
         },
 
         resetDirectoryState() {
-            this.search = ''
-            this.suggestions = []
-            this.searchResults = []
-            this.searchPagination = null
+            this.search = '';
+            this.suggestions = [];
+            this.searchResults = [];
+            this.searchPagination = null;
 
-            this.folderPage = 1
-            this.filePage = 1
-            this.searchPage = 1
+            this.folderPage = 1;
+            this.filePage = 1;
+            this.searchPage = 1;
         },
 
         async changeFolderPage(page) {
             if (
                 !this.folderPagination ||
                 page < 1 ||
-                page >
-                    this.folderPagination
-                        .last_page
+                page > this.folderPagination.last_page
             ) {
-                return
+                return;
             }
 
-            this.folderPage = page
-            await this.loadFolder()
+            this.folderPage = page;
+            await this.loadFolder();
         },
 
         async changeFilePage(page) {
             if (
                 !this.filePagination ||
                 page < 1 ||
-                page >
-                    this.filePagination
-                        .last_page
+                page > this.filePagination.last_page
             ) {
-                return
+                return;
             }
 
-            this.filePage = page
-            await this.loadFolder()
+            this.filePage = page;
+            await this.loadFolder();
         },
 
         async changeSearchPage(page) {
             if (
                 !this.searchPagination ||
                 page < 1 ||
-                page >
-                    this.searchPagination
-                        .last_page
+                page > this.searchPagination.last_page
             ) {
-                return
+                return;
             }
 
-            this.searchPage = page
-            await this.exactSearch()
+            this.searchPage = page;
+            await this.exactSearch();
         },
 
         showApiError(response, data) {
             if (response.status === 422) {
-                const firstError =
-                    Object.values(
-                        data.errors ?? {}
-                    )[0]?.[0]
+                const firstError = Object.values(data.errors ?? {})[0]?.[0];
 
-                alert(
-                    firstError ??
-                        data.message ??
-                        'Validation failed.'
-                )
+                alert(firstError ?? data.message ?? 'Validation failed.');
 
-                return
+                return;
             }
 
-            alert(
-                data.message ??
-                    `Error ${response.status}`
-            )
+            alert(data.message ?? `Error ${response.status}`);
         },
 
-        async showDeleteError(
-            response,
-            fallbackMessage
-        ) {
-            let message = fallbackMessage
+        async showDeleteError(response, fallbackMessage) {
+            let message = fallbackMessage;
 
             try {
-                const data =
-                    await response.json()
+                const data = await response.json();
 
-                message =
-                    data.message ?? message
+                message = data.message ?? message;
             } catch {
                 // Response has no JSON body.
             }
 
-            alert(message)
+            alert(message);
         },
 
         showUnexpectedError(error) {
-            console.error(error)
+            console.error(error);
 
-            alert(
-                error.message ??
-                    'Unexpected error occurred.'
-            )
+            alert(error.message ?? 'Unexpected error occurred.');
         },
     },
 
     mounted() {
-        this.loadFolder()
+        this.loadFolder();
     },
-}
+};
 </script>
 
 <template>
@@ -634,9 +537,7 @@ export default {
                         >
                             <FolderPlus class="h-4 w-4" />
 
-                            <span>
-                                Create folder
-                            </span>
+                            <span> Create folder </span>
                         </button>
 
                         <button
@@ -645,9 +546,7 @@ export default {
                         >
                             <FilePlusCorner class="h-4 w-4" />
 
-                            <span>
-                                Create file
-                            </span>
+                            <span> Create file </span>
                         </button>
                     </div>
 

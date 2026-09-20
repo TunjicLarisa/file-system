@@ -8,7 +8,6 @@ void createInertiaApp({
         switch (true) {
             case name === 'FileManager':
                 return null;
-                
         }
     },
     progress: {

@@ -1,5 +1,5 @@
 <script>
-import { File } from 'lucide-vue-next'
+import { File } from 'lucide-vue-next';
 
 export default {
     components: {
@@ -33,25 +33,25 @@ export default {
     computed: {
         searchValue: {
             get() {
-                return this.modelValue
+                return this.modelValue;
             },
 
             set(value) {
-                this.$emit('update:modelValue', value)
+                this.$emit('update:modelValue', value);
             },
         },
 
         searchAllValue: {
             get() {
-                return this.searchAllFiles
+                return this.searchAllFiles;
             },
 
             set(value) {
-                this.$emit('update:searchAllFiles', value)
+                this.$emit('update:searchAllFiles', value);
             },
         },
     },
-}
+};
 </script>
 
 <template>

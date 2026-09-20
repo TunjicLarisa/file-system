@@ -1,25 +1,25 @@
 services:
-  app:
-    build:
-      context: .
+    app:
+        build:
+            context: .
 
-    ports:
-      - "8000:8000"
+        ports:
+            - '8000:8000'
 
-    environment:
-      APP_ENV: local
-      APP_DEBUG: "true"
-      APP_URL: http://localhost:8000
+        environment:
+            APP_ENV: local
+            APP_DEBUG: 'true'
+            APP_URL: http://localhost:8000
 
-      DB_CONNECTION: sqlite
-      DB_DATABASE: /var/www/storage/app/database.sqlite
+            DB_CONNECTION: sqlite
+            DB_DATABASE: /var/www/storage/app/database.sqlite
 
-      SESSION_DRIVER: file
-      CACHE_STORE: file
-      QUEUE_CONNECTION: sync
+            SESSION_DRIVER: file
+            CACHE_STORE: file
+            QUEUE_CONNECTION: sync
 
-    volumes:
-      - sqlite-data:/var/www/storage/app
+        volumes:
+            - sqlite-data:/var/www/storage/app
 
 volumes:
-  sqlite-data:
+    sqlite-data:
