@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FolderController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\FolderController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('folders')->group(function () {
     Route::get('/', [FolderController::class, 'index']);

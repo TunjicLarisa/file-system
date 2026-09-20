@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Folder extends Model
 {
-    
     protected $fillable = [
         'name',
         'parent_id',
@@ -37,6 +36,6 @@ class Folder extends Model
             $folder = $folder->parent;
         }
 
-        return 'Home / ' . implode(' / ', $parts);
+        return 'Home / '.implode(' / ', $parts);
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['parent_id', 'name']);
-             $table->unique(['parent_id', 'name']);
+            $table->unique(['parent_id', 'name']);
         });
     }
 

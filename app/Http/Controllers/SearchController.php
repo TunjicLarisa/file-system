@@ -21,9 +21,9 @@ class SearchController extends Controller
 
         $files = File::query()
             ->with('folder')
-            ->where('name', 'like', $escapedSearch . '%')
+            ->where('name', 'like', $escapedSearch.'%')
             ->when(
-                !$searchAll,
+                ! $searchAll,
                 fn ($query) => $folderId !== null
                     ? $query->where('folder_id', $folderId)
                     : $query->whereNull('folder_id')
@@ -50,7 +50,7 @@ class SearchController extends Controller
             ->with('folder')
             ->where('name', $search)
             ->when(
-                !$searchAll,
+                ! $searchAll,
                 fn ($query) => $folderId !== null
                     ? $query->where('folder_id', $folderId)
                     : $query->whereNull('folder_id')

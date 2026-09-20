@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Folder;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreFolderRequest;
 use App\Http\Resources\FolderResource;
+use App\Models\Folder;
+use Illuminate\Http\Request;
 
 class FolderController extends Controller
 {
@@ -23,7 +23,7 @@ class FolderController extends Controller
                 fn ($query) => $query->whereNull('parent_id')
             )
             ->orderBy('name')
-            ->paginate(3);
+            ->paginate(50);
 
         return FolderResource::collection($folders);
     }

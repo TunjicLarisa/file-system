@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFileRequest;
+use App\Http\Resources\FileResource;
 use App\Models\File;
 use Illuminate\Http\Request;
-use App\Http\Resources\FileResource;
-use App\Http\Requests\StoreFileRequest;
 
 class FileController extends Controller
 {
@@ -20,7 +20,7 @@ class FileController extends Controller
                 fn ($query) => $query->whereNull('folder_id')
             )
             ->orderBy('name')
-            ->paginate(3);
+            ->paginate(50);
 
         return FileResource::collection($files);
     }
