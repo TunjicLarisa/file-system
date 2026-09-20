@@ -1,8 +1,8 @@
 <script>
-import { Folder, FolderPlus, FilePlusCorner, FolderOpen, FileText, File, FileXCorner, Trash, ArrowLeft  } from 'lucide-vue-next'
+import { Folder, FolderPlus, FilePlusCorner, FolderOpen, FileText, File, FileXCorner, Trash, ArrowLeft, CircleChevronLeft, CircleChevronRight  } from 'lucide-vue-next'
 export default {
     components: {
-        Folder, FolderPlus, FilePlusCorner, FolderOpen, FileText, File, FileXCorner, Trash, ArrowLeft
+        Folder, FolderPlus, FilePlusCorner, FolderOpen, FileText, File, FileXCorner, Trash, ArrowLeft, CircleChevronLeft, CircleChevronRight
     },
     data() {
         return {
@@ -19,6 +19,12 @@ export default {
             searchResults: [],
 
             searchTimer: null,
+
+            folderPage: 1,
+            filePage: 1,
+
+            folderPagination: null,
+            filePagination: null,
         }
     },
     watch: {
@@ -96,17 +102,22 @@ export default {
 
         methods: {
             async loadFolder() {
-                let foldersUrl = '/api/folders'
-                let filesUrl = '/api/files'
+                const folderParams = new URLSearchParams({
+                    page: this.folderPage,
+                })
+
+                const fileParams = new URLSearchParams({
+                    page: this.filePage,
+                })
 
                 if (this.currentFolderId !== null) {
-                    foldersUrl += `?parent_id=${this.currentFolderId}`
-                    filesUrl += `?folder_id=${this.currentFolderId}`
+                    folderParams.set('parent_id', this.currentFolderId)
+                    fileParams.set('folder_id', this.currentFolderId)
                 }
 
                 const [foldersResponse, filesResponse] = await Promise.all([
-                    fetch(foldersUrl),
-                    fetch(filesUrl),
+                    fetch(`/api/folders?${folderParams.toString()}`),
+                    fetch(`/api/files?${fileParams.toString()}`),
                 ])
 
                 if (!foldersResponse.ok || !filesResponse.ok) {
@@ -117,8 +128,11 @@ export default {
                 const foldersData = await foldersResponse.json()
                 const filesData = await filesResponse.json()
 
-                this.folders = foldersData.data ?? foldersData
-                this.files = filesData.data ?? filesData;
+                this.folders = foldersData.data ?? []
+                this.files = filesData.data ?? []
+
+                this.folderPagination = foldersData.meta ?? null
+                this.filePagination = filesData.meta ?? null
             },
             async createFolder() {
                 const name = prompt('Folder name:')
@@ -142,10 +156,8 @@ export default {
                         }),
                     })
 
-                    // PRVO pročitaj response
                     const data = await response.json()
 
-                    // TEK ONDA koristi data
                     if (!response.ok) {
                         if (response.status === 422) {
                             const firstError =
@@ -193,7 +205,7 @@ export default {
                             const data = await response.json()
                             message = data.message ?? message
                         } catch {
-                            // response nema JSON body
+                            // response no JSON body
                         }
 
                         alert(message)
@@ -213,7 +225,13 @@ export default {
                 })
 
                 this.currentFolderId = folder.id
+
+                this.folderPage = 1
+                this.filePage = 1
+
                 this.search = ''
+                this.suggestions = []
+                this.searchResults = []
 
                 await this.loadFolder()
             },
@@ -288,7 +306,7 @@ export default {
                             const data = await response.json()
                             message = data.message ?? message
                         } catch {
-                            // response nema JSON body
+                            // response no JSON body
                         }
 
                         alert(message)
@@ -393,7 +411,6 @@ export default {
 
                 this.searchResults = data.data ?? data
 
-                // zatvori autocomplete
                 this.suggestions = []
 
             } catch (error) {
@@ -411,6 +428,8 @@ export default {
             this.path = []
             this.currentFolderId = null
             this.search = ''
+            this.folderPage = 1
+            this.filePage = 1
 
             await this.loadFolder()
         },
@@ -429,6 +448,8 @@ export default {
             }
 
             this.search = ''
+            this.folderPage = 1
+            this.filePage = 1
 
             await this.loadFolder()
         },
@@ -439,9 +460,37 @@ export default {
                 this.path[this.path.length - 1].id
 
             this.search = ''
+            this.folderPage = 1
+            this.filePage = 1
 
             await this.loadFolder()
         },
+        async changeFolderPage(page) {
+            if (
+                !this.folderPagination ||
+                page < 1 ||
+                page > this.folderPagination.last_page
+            ) {
+                return;
+            }
+
+            this.folderPage = page;
+            await this.loadFolder();
+        },
+
+        async changeFilePage(page) {
+            if (
+                !this.filePagination ||
+                page < 1 ||
+                page > this.filePagination.last_page
+            ) {
+                return;
+            }
+
+            this.filePage = page;
+            await this.loadFolder();
+        },
+        
     },
     mounted() {
         this.loadFolder()
@@ -580,7 +629,7 @@ export default {
                             <span>Create file</span>
                         </button>
                     </div>
-
+                    <!-- ####### FILES ####### -->
                     <section class="mb-8">
                         <div class="mb-4 flex items-center justify-between">
                             <h2 class="text-sm font-semibold tracking-wide text-gray-500">
@@ -628,6 +677,34 @@ export default {
                                     <Trash />
                                 </button>
                             </div>
+                            <div
+                                v-if="folderPagination && folderPagination.last_page > 1"
+                                class="mt-4 flex items-center justify-center gap-3"
+                            >
+                                <button
+                                    :disabled="folderPagination.current_page === 1"
+                                    @click="changeFolderPage(folderPagination.current_page - 1)"
+                                    class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                    <CircleChevronLeft class="h-6 w-6" />
+                                </button>
+
+                                <span class="text-sm text-gray-500">
+                                    {{ folderPagination.current_page }}
+                                    /
+                                    {{ folderPagination.last_page }}
+                                </span>
+
+                                <button
+                                    :disabled="
+                                        folderPagination.current_page === folderPagination.last_page
+                                    "
+                                    @click="changeFolderPage(folderPagination.current_page + 1)"
+                                    class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                    <CircleChevronRight class="h-6 w-6" />
+                                </button>
+                            </div>
                         </div>
 
                         <div
@@ -641,20 +718,27 @@ export default {
                             </p>
                         </div>
                     </section>
-
+                    <!--    #######  FILES  #######  -->
                     <section>
                         <div class="mb-4 flex items-center justify-between">
                             <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">
-                                {{
-                                    search
-                                        ? 'Search results'
-                                        : 'Files'
-                                }}
+                                {{ search ? 'Search results' : 'Files' }}
                             </h2>
 
                             <span class="text-xs text-gray-400">
-                                {{ displayedFiles.length }}
-                                result{{ displayedFiles.length === 1 ? '' : 's' }}
+                                {{
+                                    search
+                                        ? displayedFiles.length
+                                        : (filePagination?.total ?? displayedFiles.length)
+                                }}
+                                file{{
+                                    (search
+                                        ? displayedFiles.length
+                                        : (filePagination?.total ?? displayedFiles.length)
+                                    ) === 1
+                                        ? ''
+                                        : 's'
+                                }}
                             </span>
                         </div>
 
@@ -668,8 +752,10 @@ export default {
                                 class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 transition hover:bg-gray-50"
                             >
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-10 text-gray-900 w-10 items-center justify-center rounded-lg bg-gray-100 text-xl">
-                                        <File class="text-gray-900"/>
+                                    <div
+                                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-900"
+                                    >
+                                        <File class="h-5 w-5" />
                                     </div>
 
                                     <div>
@@ -677,7 +763,17 @@ export default {
                                             {{ file.name }}
                                         </div>
 
-                                        <div class="text-xs text-gray-400">
+                                        <div
+                                            v-if="searchAllFiles && file.folder_path"
+                                            class="text-xs text-gray-400"
+                                        >
+                                            {{ file.folder_path }}
+                                        </div>
+
+                                        <div
+                                            v-else
+                                            class="text-xs text-gray-400"
+                                        >
                                             File
                                         </div>
                                     </div>
@@ -685,7 +781,8 @@ export default {
 
                                 <button
                                     @click="deleteFile(file)"
-                                    class="rounded-md px-3 py-2 text-sm text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                                    aria-label="Delete file"
+                                    class="cursor-pointer rounded-md px-3 py-2 text-sm text-gray-400 transition hover:bg-red-50 hover:text-red-600"
                                 >
                                     <Trash />
                                 </button>
@@ -705,6 +802,39 @@ export default {
                                         : 'No files in this directory.'
                                 }}
                             </p>
+                        </div>
+
+                        <div
+                            v-if="
+                                !search &&
+                                filePagination &&
+                                filePagination.last_page > 1
+                            "
+                            class="mt-4 flex items-center justify-center gap-3"
+                        >
+                            <button
+                                :disabled="filePagination.current_page === 1"
+                                @click="changeFilePage(filePagination.current_page - 1)"
+                                class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                <CircleChevronLeft class="h-6 w-6" />
+                            </button>
+
+                            <span class="text-sm text-gray-500">
+                                {{ filePagination.current_page }}
+                                /
+                                {{ filePagination.last_page }}
+                            </span>
+
+                            <button
+                                :disabled="
+                                    filePagination.current_page === filePagination.last_page
+                                "
+                                @click="changeFilePage(filePagination.current_page + 1)"
+                                class="cursor-pointer transition hover:scale-110 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                <CircleChevronRight class="h-6 w-6" />
+                            </button>
                         </div>
                     </section>
                 </div>

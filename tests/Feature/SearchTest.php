@@ -156,3 +156,18 @@ test('exact search across all files returns matches from different folders', fun
             'folder_id' => $personal['id'],
         ]);
 });
+
+test('treats sql wildcard characters as literal search characters', function () {
+    $this->postJson('/api/files', [
+        'name' => 'contract.pdf',
+        'folder_id' => null,
+    ]);
+
+    $response = $this->getJson(
+        '/api/search/suggestions?q=%25&all=1'
+    );
+
+    $response
+        ->assertOk()
+        ->assertJsonCount(0, 'data');
+});

@@ -13,7 +13,6 @@ Route::prefix('folders')->group(function () {
 
 Route::prefix('files')->group(function () {
     Route::get('/', [FileController::class, 'index']);
-    Route::get('/search', [FileController::class, 'search']);
     Route::post('/', [FileController::class, 'store']);
     Route::delete('/{file}', [FileController::class, 'destroy']);
 });

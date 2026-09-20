@@ -83,3 +83,36 @@ test('deleting a folder deletes its nested contents', function () {
         'id' => $file['id'],
     ]);
 });
+
+test('paginates files in a folder', function () {
+    $folder = $this->postJson('/api/folders', [
+        'name' => 'Large Folder',
+        'parent_id' => null,
+    ])->json('data');
+
+    for ($i = 1; $i <= 55; $i++) {
+        $this->postJson('/api/files', [
+            'name' => "file-{$i}.txt",
+            'folder_id' => $folder['id'],
+        ]);
+    }
+
+    $firstPage = $this->getJson(
+        "/api/files?folder_id={$folder['id']}&page=1"
+    );
+
+    $firstPage
+        ->assertOk()
+        ->assertJsonCount(50, 'data')
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.last_page', 2);
+
+    $secondPage = $this->getJson(
+        "/api/files?folder_id={$folder['id']}&page=2"
+    );
+
+    $secondPage
+        ->assertOk()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.current_page', 2);
+});

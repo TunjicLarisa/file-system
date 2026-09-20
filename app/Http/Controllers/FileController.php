@@ -20,7 +20,7 @@ class FileController extends Controller
                 fn ($query) => $query->whereNull('folder_id')
             )
             ->orderBy('name')
-            ->get();
+            ->paginate(3);
 
         return FileResource::collection($files);
     }

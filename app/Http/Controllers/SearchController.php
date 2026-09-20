@@ -17,8 +17,11 @@ class SearchController extends Controller
         $searchAll = $request->boolean('all');
         $folderId = $request->validated('folder_id');
 
+        $escapedSearch = addcslashes($search, '%_\\');
+
         $files = File::query()
-            ->where('name', 'like', $search . '%')
+            ->with('folder')
+            ->where('name', 'like', $escapedSearch . '%')
             ->when(
                 !$searchAll,
                 fn ($query) => $folderId !== null

@@ -23,7 +23,7 @@ class FolderController extends Controller
                 fn ($query) => $query->whereNull('parent_id')
             )
             ->orderBy('name')
-            ->get();
+            ->paginate(3);
 
         return FolderResource::collection($folders);
     }
