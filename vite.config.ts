@@ -48,7 +48,6 @@ export default defineConfig({
             'resources/js/actions/**',
             'resources/js/components/ui/*',
             'resources/js/routes/**',
-            'resources/js/wayfinder/**',
         ],
         options: {
             denyWarnings: true,

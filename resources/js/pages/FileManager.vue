@@ -49,46 +49,10 @@ export default {
         },
     },
     computed: {
-            currentFolder() {
-                if (this.currentFolderId === null) {
-                    return null
-                }
-
-                return this.folders.find(folder => {
-                    return folder.id === this.currentFolderId
-                })
-            },
-
             childFolders() {
                 return this.folders.filter(folder => {
                     return folder.parent_id === this.currentFolderId
                 })
-            },
-
-            currentFiles() {
-                return this.files.filter(file => {
-                    return file.folder_id === this.currentFolderId
-                })
-            },
-
-            breadcrumbs() {
-                const result = []
-                let folderId = this.currentFolderId
-
-                while (folderId !== null) {
-                    const folder = this.folders.find(folder => {
-                        return folder.id === folderId
-                    })
-
-                    if (!folder) {
-                        break
-                    }
-
-                    result.unshift(folder)
-                    folderId = folder.parent_id
-                }
-
-                return result
             },
              displayedFiles() {
                 if (this.search.trim()) {
@@ -97,9 +61,7 @@ export default {
 
                 return this.files
             },
-
         },
-
         methods: {
             async loadFolder() {
                 const folderParams = new URLSearchParams({
@@ -313,7 +275,12 @@ export default {
                         return
                     }
 
-                    await this.loadFolder()
+                    if (this.search.trim()) { 
+                        await this.exactSearch() 
+                    } else 
+                    { await this.loadFolder() 
+                        
+                    }
                 } catch (error) {
                     console.error(error)
                     alert(error.message)

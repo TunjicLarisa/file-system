@@ -116,3 +116,11 @@ test('paginates files in a folder', function () {
         ->assertJsonCount(5, 'data')
         ->assertJsonPath('meta.current_page', 2);
 });
+
+// test('does not allow duplicate files in the same folder', ...);
+
+// test('does not allow duplicate folders in the same parent', ...);
+
+// test('paginates folders', ...);
+
+// test('rejects an invalid parent folder', ...);

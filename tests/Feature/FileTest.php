@@ -51,3 +51,35 @@ test('deletes a file', function () {
         'id' => $file['id'],
     ]);
 });
+
+test('does not allow duplicate files in the same folder', function () {
+    $folder = $this->postJson('/api/folders', [
+        'name' => 'Documents',
+        'parent_id' => null,
+    ])->json('data');
+
+    $this->postJson('/api/files', [
+        'name' => 'report.pdf',
+        'folder_id' => $folder['id'],
+    ])->assertCreated();
+
+    $response = $this->postJson('/api/files', [
+        'name' => 'report.pdf',
+        'folder_id' => $folder['id'],
+    ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+});
+
+test('rejects an empty file name', function () {
+    $response = $this->postJson('/api/files', [
+        'name' => '',
+        'folder_id' => null,
+    ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+});
