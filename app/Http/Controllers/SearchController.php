@@ -22,7 +22,10 @@ class SearchController extends Controller
 
         $files = File::query()
             ->with('folder')
-            ->where('name', 'like', $escapedSearch.'%')
+            ->whereRaw(
+                    "name LIKE ? ESCAPE '\\\\'",
+                    [$escapedSearch . '%']
+                )
             ->when(
                 ! $searchAll,
                 fn ($query) => $folderId !== null
@@ -49,7 +52,7 @@ class SearchController extends Controller
 
         $files = File::query()
             ->with('folder')
-            ->where('name', $search)
+            ->whereRaw('LOWER(name) = LOWER(?)', [$search])
             ->when(
                 ! $searchAll,
                 fn ($query) => $folderId !== null
